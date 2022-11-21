@@ -10,7 +10,9 @@ import org.springframework.boot.test.autoconfigure.web.servlet.WebMvcTest;
 import org.springframework.boot.test.mock.mockito.MockBean;
 import org.springframework.test.context.junit.jupiter.SpringExtension;
 import org.springframework.test.web.servlet.MockMvc;
+import org.springframework.web.util.NestedServletException;
 
+import static org.assertj.core.api.AssertionsForClassTypes.assertThatThrownBy;
 import static org.mockito.ArgumentMatchers.anyInt;
 import static org.mockito.Mockito.when;
 import static org.springframework.test.web.servlet.request.MockMvcRequestBuilders.get;
@@ -56,10 +58,10 @@ class AlticciControllerTest {
                 .andExpect(status().isOk())
                 .andExpect(jsonPath("$", Matchers.is(9)));
     }
-    /*@Test
-    void negativeValue() throws Exception {
-        mockMvc.perform(get("/alticci/-1"))
-                .andExpect(status().isBadRequest());
-    }*/
+    @Test()
+    void negativeValue() {
+        assertThatThrownBy(() -> mockMvc.perform(get("/alticci/-1"))
+                .andExpect(status().isInternalServerError())).isInstanceOf(NestedServletException.class).hasMessageContaining("Request processing failed; nested exception is javax.validation.ConstraintViolationException: getAlticciValue.n: must be greater than or equal to 0");
+    }
 
 }
